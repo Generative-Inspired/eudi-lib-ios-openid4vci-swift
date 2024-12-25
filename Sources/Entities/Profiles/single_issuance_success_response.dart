@@ -30,3 +30,47 @@ class SingleIssuanceSuccessResponse {
     };
   }
 }
+import 'dart:convert';
+
+class SingleIssuanceSuccessResponse {
+  final String? credential;
+  final String? transactionId;
+  final String? notificationId;
+  final String? cNonce;
+  final int? cNonceExpiresInSeconds;
+
+  SingleIssuanceSuccessResponse({
+    this.credential,
+    this.transactionId,
+    this.notificationId,
+    this.cNonce,
+    this.cNonceExpiresInSeconds,
+  });
+
+  Map<String, dynamic> toJson() => {
+    'credential': credential,
+    'transaction_id': transactionId,
+    'notification_id': notificationId,
+    'c_nonce': cNonce,
+    'c_nonce_expires_in': cNonceExpiresInSeconds,
+  };
+
+  factory SingleIssuanceSuccessResponse.fromJson(Map<String, dynamic> json) {
+    return SingleIssuanceSuccessResponse(
+      credential: json['credential'],
+      transactionId: json['transaction_id'],
+      notificationId: json['notification_id'],
+      cNonce: json['c_nonce'],
+      cNonceExpiresInSeconds: json['c_nonce_expires_in'],
+    );
+  }
+
+  static SingleIssuanceSuccessResponse? fromJsonString(String jsonString) {
+    try {
+      final jsonData = json.decode(jsonString);
+      return SingleIssuanceSuccessResponse.fromJson(jsonData);
+    } catch (e) {
+      return null;
+    }
+  }
+}
