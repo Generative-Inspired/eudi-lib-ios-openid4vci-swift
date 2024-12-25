@@ -1,95 +1,32 @@
-// Copyright (c) 2023 European Commission
-// Converted to Dart from Swift using AI by Geninspired Inc. 
-// Licensed under the Apache License, Version 2.0
 
-// Base protocol converted to abstract class
-abstract class OidCredentialAuthorizationDetail {}
+import 'dart:convert';
 
-// ByCredentialConfiguration class
-class ByCredentialConfiguration implements OidCredentialAuthorizationDetail {
-  final String credentialConfigurationId;
-  final List<String>? credentialIdentifiers;
+class AuthorizationDetails {
+  final List<Map<String, dynamic>> details;
 
-  ByCredentialConfiguration({
-    required this.credentialConfigurationId,
-    this.credentialIdentifiers,
-  });
+  AuthorizationDetails({required this.details});
 
-  // JSON serialization
   Map<String, dynamic> toJson() => {
-    'credentialConfigurationId': credentialConfigurationId,
-    'credentialIdentifiers': credentialIdentifiers,
+    'authorization_details': details,
   };
 
-  factory ByCredentialConfiguration.fromJson(Map<String, dynamic> json) {
-    return ByCredentialConfiguration(
-      credentialConfigurationId: json['credentialConfigurationId'],
-      credentialIdentifiers: json['credentialIdentifiers']?.cast<String>(),
+  factory AuthorizationDetails.fromJson(Map<String, dynamic> json) {
+    final detailsList = json['authorization_details'] as List;
+    return AuthorizationDetails(
+      details: detailsList.map((e) => e as Map<String, dynamic>).toList(),
     );
   }
-}
 
-// ByFormat enum and associated classes
-enum ByFormatType {
-  msoMdocAuthorizationDetails,
-  sdJwtVcAuthorizationDetails,
-}
+  String toJsonString() {
+    return jsonEncode(toJson());
+  }
 
-class ByFormat implements OidCredentialAuthorizationDetail {
-  final dynamic details;
-  final ByFormatType type;
-
-  ByFormat.msoMdocAuthorizationDetails(MsoMdocAuthorizationDetails details)
-      : this.details = details,
-        this.type = ByFormatType.msoMdocAuthorizationDetails;
-
-  ByFormat.sdJwtVcAuthorizationDetails(SdJwtVcAuthorizationDetails details)
-      : this.details = details,
-        this.type = ByFormatType.sdJwtVcAuthorizationDetails;
-
-  Map<String, dynamic> toJson() => {
-    'type': type.toString(),
-    'details': details.toJson(),
-  };
-
-  factory ByFormat.fromJson(Map<String, dynamic> json) {
-    final type = ByFormatType.values.firstWhere(
-      (e) => e.toString() == json['type'],
-    );
-    
-    switch (type) {
-      case ByFormatType.msoMdocAuthorizationDetails:
-        return ByFormat.msoMdocAuthorizationDetails(
-          MsoMdocAuthorizationDetails.fromJson(json['details']),
-        );
-      case ByFormatType.sdJwtVcAuthorizationDetails:
-        return ByFormat.sdJwtVcAuthorizationDetails(
-          SdJwtVcAuthorizationDetails.fromJson(json['details']),
-        );
+  static AuthorizationDetails? fromJsonString(String jsonString) {
+    try {
+      final json = jsonDecode(jsonString) as Map<String, dynamic>;
+      return AuthorizationDetails.fromJson(json);
+    } catch (_) {
+      return null;
     }
-  }
-}
-
-class MsoMdocAuthorizationDetails {
-  final String doctype;
-
-  MsoMdocAuthorizationDetails({required this.doctype});
-
-  Map<String, dynamic> toJson() => {'doctype': doctype};
-
-  factory MsoMdocAuthorizationDetails.fromJson(Map<String, dynamic> json) {
-    return MsoMdocAuthorizationDetails(doctype: json['doctype']);
-  }
-}
-
-class SdJwtVcAuthorizationDetails {
-  final String vct;
-
-  SdJwtVcAuthorizationDetails({required this.vct});
-
-  Map<String, dynamic> toJson() => {'vct': vct};
-
-  factory SdJwtVcAuthorizationDetails.fromJson(Map<String, dynamic> json) {
-    return SdJwtVcAuthorizationDetails(vct: json['vct']);
   }
 }

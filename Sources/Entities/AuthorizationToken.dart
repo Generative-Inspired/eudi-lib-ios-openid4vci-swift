@@ -1,32 +1,31 @@
-// Converted to Dart from Swift using AI by Geninspired Inc. 
-
-class ValidationError implements Exception {
-  final String message;
-  ValidationError(this.message);
-}
-
-enum AuthorizationTokenType {
-  bearer,
-  dpop,
-}
 
 class AuthorizationToken {
-  final String accessToken;
-  final AuthorizationTokenType type;
+  final String value;
+  final String? scope;
+  final String? credentialConfigurationId;
 
-  AuthorizationToken._internal(this.accessToken, this.type);
+  AuthorizationToken({
+    required this.value,
+    this.scope,
+    this.credentialConfigurationId,
+  });
 
-  factory AuthorizationToken({
-    required String accessToken,
-    required bool useDPoP,
-  }) {
-    if (accessToken.isEmpty) {
-      throw ValidationError('AuthorizationToken access token cannot be empty');
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{
+      'value': value,
+    };
+    if (scope != null) map['scope'] = scope;
+    if (credentialConfigurationId != null) {
+      map['credential_configuration_id'] = credentialConfigurationId;
     }
+    return map;
+  }
 
-    return AuthorizationToken._internal(
-      accessToken,
-      useDPoP ? AuthorizationTokenType.dpop : AuthorizationTokenType.bearer,
+  factory AuthorizationToken.fromJson(Map<String, dynamic> json) {
+    return AuthorizationToken(
+      value: json['value'] as String,
+      scope: json['scope'] as String?,
+      credentialConfigurationId: json['credential_configuration_id'] as String?,
     );
   }
 }

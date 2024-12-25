@@ -1,55 +1,25 @@
-// Translated to Dart from Swift using AI by GenInspired Inc
-// Date: December 02, 2024
-// Original Copyright (c) 2023 European Commission
-// Licensed under the Apache License, Version 2.0
-
-enum IssuanceAuthorizationType {
-  authorizationCode,
-  preAuthorizationCode,
-}
 
 class IssuanceAuthorization {
   final String code;
-  final TxCode? txCode;
-  final IssuanceAuthorizationType type;
+  final String? scope;
 
-  IssuanceAuthorization._internal(this.code, this.txCode, this.type);
+  IssuanceAuthorization({
+    required this.code,
+    this.scope,
+  });
 
-  factory IssuanceAuthorization.authorizationCode(String authorizationCode) {
-    if (authorizationCode.isEmpty) {
-      throw CredentialError('Generic error');
-    }
-    return IssuanceAuthorization._internal(
-      authorizationCode,
-      null,
-      IssuanceAuthorizationType.authorizationCode,
-    );
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{
+      'code': code,
+    };
+    if (scope != null) map['scope'] = scope;
+    return map;
   }
 
-  factory IssuanceAuthorization.preAuthorizationCode(
-    String? preAuthorizationCode,
-    TxCode? txCode,
-  ) {
-    if (preAuthorizationCode == null) {
-      throw ValidationError('Missing preAuthorizationCode');
-    }
-    if (preAuthorizationCode.isEmpty) {
-      throw CredentialError('Generic error');
-    }
-    return IssuanceAuthorization._internal(
-      preAuthorizationCode,
-      txCode,
-      IssuanceAuthorizationType.preAuthorizationCode,
+  factory IssuanceAuthorization.fromJson(Map<String, dynamic> json) {
+    return IssuanceAuthorization(
+      code: json['code'] as String,
+      scope: json['scope'] as String?,
     );
   }
-}
-
-class CredentialError implements Exception {
-  final String message;
-  CredentialError(this.message);
-}
-
-// TxCode class would need to be implemented based on requirements
-class TxCode {
-  // Implementation details needed
 }
